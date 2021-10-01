@@ -1,4 +1,4 @@
-moduledir 'external_modules'
+moduledir 'puppet/external_modules'
 
 mod 'camptocamp/pbuilder', '0.1.11'
 mod 'camptocamp/systemd', '2.9.0'
