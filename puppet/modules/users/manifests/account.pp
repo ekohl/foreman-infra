@@ -10,20 +10,24 @@
 #   The home directory
 # @param sudo
 #   The sudo line to ensure. Set to an empty string to disallow sudo
+# @param ssh_authorized_keys
+#   The SSH authorized keys to allow. Any unmanaged keys are purged.
 define users::account (
   Enum['present', 'absent'] $ensure = 'present',
   Optional[String] $fullname = undef,
   Optional[String] $passwd = undef,
   Stdlib::Absolutepath $homedir = "/home/${title}",
   String $sudo = 'ALL=(ALL) ALL',
+  Array[Users::Ssh_authorized_key] $ssh_authorized_keys = [],
 ) {
   user { $name:
-    ensure     => $ensure,
-    comment    => $fullname,
-    home       => $homedir,
-    managehome => true,
-    shell      => '/bin/bash',
-    password   => $passwd,
+    ensure         => $ensure,
+    comment        => $fullname,
+    home           => $homedir,
+    managehome     => true,
+    shell          => '/bin/bash',
+    password       => $passwd,
+    purge_ssh_keys => true,
   }
 
   if $ensure == 'present' {
@@ -34,19 +38,26 @@ define users::account (
       mode   => '0755',
     }
 
-    file { "${homedir}/.ssh":
-      ensure => directory,
-      owner  => $name,
-      group  => $name,
-      mode   => '0700',
-    }
+    unless empty($ssh_authorized_keys) {
+      file { "${homedir}/.ssh":
+        ensure => directory,
+        owner  => $name,
+        group  => $name,
+        mode   => '0700',
+      }
 
-    file { "${homedir}/.ssh/authorized_keys":
-      ensure  => file,
-      content => file("${module_name}/${name}-authorized_keys"),
-      owner   => $name,
-      group   => $name,
-      mode    => '0600',
+      $ssh_authorized_keys.each |$index, $key| {
+        $comment = $index ? {
+          0       => $key['comment'],
+          default => "${key['comment']} - ${index}",
+        }
+
+        ssh_authorized_key { $comment:
+          key  => $key['key'],
+          type => $key['type'],
+          user => $name,
+        }
+      }
     }
 
     $sudo_ensure = bool2str($sudo == '', 'absent', 'present')

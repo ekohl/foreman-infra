@@ -19,9 +19,16 @@ class profiles::jenkins::node (
   Boolean $packaging = true,
 ) {
   class { 'slave':
-    koji_certificate => $koji_certificate,
-    unittests        => $unittests,
-    packaging        => $packaging,
+    koji_certificate    => $koji_certificate,
+    unittests           => $unittests,
+    packaging           => $packaging,
+    ssh_authorized_keys => [
+      {
+        'type'    => 'ssh-rsa',
+        'key'     => 'AAAAB3NzaC1yc2EAAAADAQABAAABAQD0QacqcRQzycs7r6odx94FqSEme3O8q/IQAu8A4GTxGzUpsUKQtvE9gzi0TrYZbyzYCMD+MTmDXmk+wPB+QaaHdJhSLe+Tu4tPgX5cp3u6RnrDXVfMg8BTK5kUPcgQJ9QIOMH03weLHw7G5ZC6YCDQz0iRhofJ6ZAFle2aHTg6emjUIxG0Ox4oHhX8cqozcCm/TI3ZspBiUgJo6oaWwkDHcnzi453j5jaxOLD2ykI8+dO6F1Strk1+DnbbnD91PAZuHG9Jg3C1naGdGOYLJ5rfIRLxDkGHXLEwpS7s1lti+p4zNWpcLa5lspEVmdPrEzxmyRNul+/WR/STjKbTtCWt',
+        'comment' => 'master02.rackspace.theforeman.org',
+      },
+    ],
   }
 
   if $swap_size_mb > 0 {

@@ -19,6 +19,7 @@ class slave (
   Stdlib::Absolutepath $workspace       = '/home/jenkins/workspace',
   Boolean $unittests = $facts['os']['family'] == 'RedHat',
   Boolean $packaging = true,
+  Array[Users::Ssh_authorized_key] $ssh_authorized_keys = [],
 ) {
   if $facts['os']['family'] == 'RedHat' {
     $java_package = 'java-11-openjdk-headless'
@@ -44,8 +45,9 @@ class slave (
   }
 
   users::account { 'jenkins':
-    homedir => $homedir,
-    sudo    => $sudo,
+    homedir             => $homedir,
+    sudo                => $sudo,
+    ssh_authorized_keys => $ssh_authorized_keys,
   }
 
   file { $workspace:
