@@ -1,4 +1,16 @@
-define users::account(
+# @summary Manage a user account
+#
+# @param ensure
+#   The state of the user to ensure
+# @param fullname
+#   The full name of the user
+# @param passwd
+#   The password hash
+# @param homedir
+#   The home directory
+# @param sudo
+#   The sudo line to ensure. Set to an empty string to disallow sudo
+define users::account (
   Enum['present', 'absent'] $ensure = 'present',
   Optional[String] $fullname = undef,
   Optional[String] $passwd = undef,
@@ -47,5 +59,4 @@ define users::account(
     ensure  => $sudo_ensure,
     content => "${name} ${sudo}",
   }
-
 }

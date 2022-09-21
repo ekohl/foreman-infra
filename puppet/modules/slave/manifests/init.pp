@@ -1,3 +1,17 @@
+# @summary A Jenkins node
+#
+# @param koji_certificate
+#   The certificate to communicate with Koji
+# @param uploader
+#   Whether the node is allowed to upload Debian packages
+# @param homedir
+#   The home directory of the user
+# @param workspace
+#   The workspace for Jenkins
+# @param unittests
+#   Whether to install packages to allow unit tests to run
+# @param packaging
+#   Whether to install packages to allow packaging to run
 class slave (
   Optional[String] $koji_certificate    = undef,
   Boolean $uploader                     = true,
@@ -6,7 +20,6 @@ class slave (
   Boolean $unittests = $facts['os']['family'] == 'RedHat',
   Boolean $packaging = true,
 ) {
-
   if $facts['os']['family'] == 'RedHat' {
     $java_package = 'java-11-openjdk-headless'
 
@@ -87,14 +100,14 @@ class slave (
   }
 
   if $unittests {
-    class {'slave::unittests':
+    class { 'slave::unittests':
       homedir => $homedir,
     }
   }
 
   # Packaging
   if $packaging {
-    class {'slave::packaging':
+    class { 'slave::packaging':
       koji_certificate => $koji_certificate,
       uploader         => $uploader,
       homedir          => $homedir,
