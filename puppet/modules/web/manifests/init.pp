@@ -3,17 +3,8 @@
 # All vhosts can be protected by a single SSL cert with additional names added
 # in the certonly $domains parameter below.
 #
-# @param https
-#   to request an LE cert via webroot mode, the HTTP vhost must be up.  To
-#   start httpd, the certs have to exist, so keep SSL vhosts disabled until the
-#   certs are present via the HTTP vhost and only then enable the SSL vhosts.
-#
-class web(
-  Boolean $https = false,
-) {
-  class { 'web::base':
-    letsencrypt => $https,
-  }
+class web {
+  include web::base
 
   if $facts['os']['selinux']['enabled'] {
     include selinux
